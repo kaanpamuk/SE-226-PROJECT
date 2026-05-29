@@ -73,10 +73,19 @@ def build_tracklist(tags, track_count):
 
     # Her etiket başına kaç parça çekileceğini hesapla
     # Tekrarları telafi etmek için gerekenden fazla çek
-    # Her tag'den en fazla track_count//2 kadar çek — birden fazla tag'in katkı sağlaması için
-    per_tag_limit = max(5, track_count // 2) if tags else 10
+    per_tag_limit = max(10, (track_count * 2) // len(tags) + 2) if tags else 10
 
     for tag in tags:
+        # Karakter temizliği yaparken boşlukları silmiyoruz (Türkçe pop için)
+        tag = tag.replace("&", "").replace("/", "").strip()
+
+        # "rb" çıkarsa Last.fm'in sevdiği "rnb"ye dönüştürüyoruz (R&B ayrımı için)
+        if tag == "rb":
+            tag = "rnb"
+
+        if not tag:
+            continue
+
         raw_tracks = fetch_tracks_by_tag(tag, limit=per_tag_limit)
 
         for track in raw_tracks:
@@ -95,14 +104,13 @@ def build_tracklist(tags, track_count):
                     "url": url,
                 })
 
-            # Yeterli parça varsa erken dur
-            if len(tracklist) >= track_count:
-                break
+        # KRİTİK DÜZELTME: İçerideki ve dışarıdaki "if len(tracklist) >= track_count: break"
+        # satırlarını sildik. Böylece döngü erken kırılmayacak, tüm etiketleri (duygu ve sanatçıları)
+        # tek tek dolaşıp muazzam, zengin bir ortak havuz oluşturacak!
 
-        if len(tracklist) >= track_count:
-            break
+    # Sonuçları döndürmeden önce havuzu güzelce karıştırıyoruz
+    import random
+    random.shuffle(tracklist)
 
-    # Tam olarak istenen sayıya kırp
+    # Tam olarak istenen sayıya (8 şarkıya) şimdi güvenle kırpıyoruz
     return tracklist[:track_count]
-
-
