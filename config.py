@@ -6,8 +6,8 @@
 # ──────────────────────────────────────────────────────────────
 # API ANAHTARLARI — Çalıştırmadan önce kendi anahtarlarınızla değiştirin
 # ──────────────────────────────────────────────────────────────
-GEMINI_API_KEY = "AIzaSyCVbI0MTh-m_im-l3VSv7a5Ae10hGelphk"
-LASTFM_API_KEY = "56b29f8172077e6005444fb5d19b84af"
+GEMINI_API_KEY = ""
+LASTFM_API_KEY = ""
 
 # ──────────────────────────────────────────────────────────────
 # Last.fm API
