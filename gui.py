@@ -21,7 +21,6 @@ from config import (
     GENRES, ERAS,
     DEFAULT_GENRE, DEFAULT_ERA,
     DEFAULT_TRACK_COUNT, MIN_TRACK_COUNT, MAX_TRACK_COUNT,
-    GENRE_LASTFM_SEED_TAGS, GENRE_SHORTHAND, ERA_SHORTHAND,
 )
 from gemini_api import query_gemini
 from lastfm_api import build_tracklist
@@ -130,15 +129,6 @@ class AlbumGeneratorApp:
         s.map("Save.TButton",
               background=[("active", BLUE), ("disabled", WHITE_FAINT)])
 
-        # Dinle butonu — mavi, parça satırlarında
-        s.configure("Listen.TButton",
-                     background=BLUE, foreground=WHITE,
-                     font=("Segoe UI", 8, "bold"),
-                     borderwidth=0, padding=(10, 3))
-        s.map("Listen.TButton",
-              background=[("active", BLUE_LIGHT), ("disabled", WHITE_FAINT)],
-              foreground=[("active", WHITE)])
-
     # ──────────────────────────────────────────────────────────
     # Arayüz Oluşturma
     # ──────────────────────────────────────────────────────────
@@ -216,15 +206,13 @@ class AlbumGeneratorApp:
 
         # ── Parça Sayısı ──
         self._label(pad, "Track Count")
-        self.track_count_var = tk.StringVar(value=str(DEFAULT_TRACK_COUNT))
-        spinbox = ttk.Spinbox(pad, from_=MIN_TRACK_COUNT, to=MAX_TRACK_COUNT,
+        self.track_count_var = tk.IntVar(value=DEFAULT_TRACK_COUNT)
+        ttk.Spinbox(pad, from_=MIN_TRACK_COUNT, to=MAX_TRACK_COUNT,
                     textvariable=self.track_count_var,
+                    state="readonly",
                     style="Accent.TSpinbox",
                     font=("Segoe UI", 10),
-                    width=6)
-        spinbox.pack(anchor="w", pady=(0, 28))
-        spinbox.bind("<FocusOut>", self._clamp_track_count)
-        spinbox.bind("<Return>", self._clamp_track_count)
+                    width=6).pack(anchor="w", pady=(0, 28))
 
         # ── Oluştur ──
         self.gen_btn = ttk.Button(pad, text="GENERATE ALBUM",
@@ -237,20 +225,6 @@ class AlbumGeneratorApp:
                                    bg=BLACK_LIGHT, fg=WHITE_DIM,
                                    font=("Segoe UI", 8, "italic"), anchor="w")
         self.status_lbl.pack(anchor="w", fill=tk.X)
-
-    def _clamp_track_count(self, *_):
-        """Focus kaybedince değeri MIN-MAX aralığına kilitler ve slider'ı senkronize eder."""
-        try:
-            val = int(self.track_count_var.get())
-            if val < MIN_TRACK_COUNT:
-                val = MIN_TRACK_COUNT
-            elif val > MAX_TRACK_COUNT:
-                val = MAX_TRACK_COUNT
-            self.track_count_var.set(str(val))
-            self._slider_var.set(val)
-        except ValueError:
-            self.track_count_var.set(str(DEFAULT_TRACK_COUNT))
-            self._slider_var.set(DEFAULT_TRACK_COUNT)
 
     def _label(self, parent, text):
         tk.Label(parent, text=text, bg=BLACK_LIGHT, fg=BLUE_LIGHT,
@@ -329,10 +303,11 @@ class AlbumGeneratorApp:
         genre = self.genre_var.get()
         era = self.era_var.get()
         try:
-            tc = int(self.track_count_var.get())
-            tc = max(MIN_TRACK_COUNT, min(MAX_TRACK_COUNT, tc))
-        except (tk.TclError, ValueError):
+            tc = self.track_count_var.get()
+        except tk.TclError:
             tc = DEFAULT_TRACK_COUNT
+        # Güvenlik: değeri izin verilen aralığa sınırla
+        tc = max(MIN_TRACK_COUNT, min(MAX_TRACK_COUNT, tc))
 
         self.is_generating = True
         self.gen_btn.config(state="disabled")
@@ -347,18 +322,13 @@ class AlbumGeneratorApp:
             self.root.after(0, self._status, "✨ Gemini is thinking...", AMBER)
             data = query_gemini(journal, genre, era, tc)
 
-            self.root.after(0, self._status, "🎵 Fetching tracks...", AMBER)
+            self.root.after(0, self._status,
+                           "🎵 Fetching tracks from Last.fm...", AMBER)
             tags = data.get("lastfm_tags", [])
-            era_short = ERA_SHORTHAND.get(era, "")
-            genre_seeds = GENRE_LASTFM_SEED_TAGS.get(genre, [])
-            seed_tags = []
-            if era_short:
-                seed_tags.append(era_short)
-            seed_tags += [t for t in genre_seeds if t not in seed_tags]
-            merged_tags = seed_tags + [t for t in tags if t not in seed_tags]
-            tracks = build_tracklist(merged_tags, tc)
+            tracks = build_tracklist(tags, tc)
 
-            self.root.after(0, self._status, "🎨 Generating cover...", AMBER)
+            self.root.after(0, self._status,
+                           "🎨 Generating cover art...", AMBER)
             prompt = data.get("cover_prompt", "abstract album cover art")
             img = generate_cover(prompt, genre)
 
@@ -518,11 +488,14 @@ class AlbumGeneratorApp:
         a_lbl.pack(anchor="w")
 
         url = track.get("url", "")
-        ttk.Button(row, text="Listen ▶",
-                   style="Listen.TButton",
-                   cursor="hand2",
-                   command=lambda u=url: webbrowser.open(u) if u else None
-                   ).pack(side=tk.RIGHT, padx=(10, 0))
+        tk.Button(row, text="Listen ▶",
+                  bg=BLUE, fg=WHITE,
+                  font=("Segoe UI", 8, "bold"),
+                  relief=tk.FLAT, cursor="hand2",
+                  activebackground=BLUE_LIGHT, activeforeground=WHITE,
+                  padx=10, pady=3, bd=0,
+                  command=lambda u=url: webbrowser.open(u) if u else None
+                  ).pack(side=tk.RIGHT, padx=(10, 0))
 
         all_w = [n_lbl, t_lbl, a_lbl, col]
 
@@ -584,6 +557,3 @@ class AlbumGeneratorApp:
     # ──────────────────────────────────────────────────────────
     def _status(self, text, color=WHITE_DIM):
         self.status_lbl.config(text=text, fg=color)
-
-
-
