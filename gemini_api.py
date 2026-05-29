@@ -66,10 +66,11 @@ The era is: {era}
 The desired number of tracks is: {track_count}
 
 Important rules for lastfm_tags:
-- Tags must be real Last.fm tags that would return results (e.g., "indie", "rock", "sad", "chill", "80s", "electronic")
-- Include a mix of genre tags and mood/feeling tags
-- Use only lowercase
-- 4 to 6 tags total
+•⁠  ⁠If the user mentions a specific western pop star like "selena gomez" or "ariana grande", do NOT use their exact name as a tag since Last.fm tags prefer genres. Instead, combine the requested genre with specific sub-genres like "dance-pop", "contemporary r&b", "teen pop", or "synth-pop" that directly represent that artist's musical style to ensure their type of music populates the list.
+•⁠  ⁠Include a mix of genre tags (e.g., "{genre}") and relevant mood tags.
+•⁠  ⁠CRITICAL: If the selected genre is 'Türk Pop' or the prompt implies Turkish music, EVERY SINGLE TAG you generate MUST be chosen ONLY from this fixed list of valid Last.fm Turkish tags: ["türkçe pop", "türkçe", "turkish", "türkçe slow", "türkçe rock", "türkçe rap", "türkçe akustik", "türkçe 90lar"]. 
+•⁠  ⁠NEVER invent or translate your own Turkish mood tags like "türkçe rahatlatıcı", "türkçe hüzünlü", or "türkçe rüyamsı" because they do not exist on Last.fm and will return 0 songs. If the mood is sad, use "türkçe slow". If the mood is happy/chill, use "türkçe pop" or "türkçe akustik".
+•⁠  ⁠Use only lowercase, 4 to 6 tags total.
 
 Journal entry:
 \"{journal_text}\"
@@ -107,3 +108,5 @@ Return ONLY the JSON object, nothing else."""
         raise ValueError(f"Failed to parse Gemini response as JSON: {e}\nRaw response: {raw_text}")
     except Exception as e:
         raise Exception(f"Gemini API error: {e}")
+
+

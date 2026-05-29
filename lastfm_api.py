@@ -73,7 +73,8 @@ def build_tracklist(tags, track_count):
 
     # Her etiket başına kaç parça çekileceğini hesapla
     # Tekrarları telafi etmek için gerekenden fazla çek
-    per_tag_limit = max(10, (track_count * 2) // len(tags) + 2) if tags else 10
+    # Her tag'den en fazla track_count//2 kadar çek — birden fazla tag'in katkı sağlaması için
+    per_tag_limit = max(5, track_count // 2) if tags else 10
 
     for tag in tags:
         raw_tracks = fetch_tracks_by_tag(tag, limit=per_tag_limit)
@@ -103,3 +104,5 @@ def build_tracklist(tags, track_count):
 
     # Tam olarak istenen sayıya kırp
     return tracklist[:track_count]
+
+

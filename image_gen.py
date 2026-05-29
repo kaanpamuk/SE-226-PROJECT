@@ -20,7 +20,7 @@ from config import (
 
 # Prompt'un URL'de sorun yaratmaması için maksimum karakter sınırı
 _MAX_PROMPT_LEN = 480
-_MAX_RETRIES = 3
+_MAX_RETRIES = 2
 
 
 def _truncate_prompt(text, max_len=_MAX_PROMPT_LEN):
@@ -77,7 +77,7 @@ def generate_cover(prompt, genre="Pop"):
     last_error = None
     for attempt in range(1, _MAX_RETRIES + 1):
         try:
-            response = requests.get(url, timeout=120)
+            response = requests.get(url, timeout=45)
             response.raise_for_status()
 
             # Yanıt baytlarını PIL Image nesnesine dönüştür
@@ -96,3 +96,5 @@ def generate_cover(prompt, genre="Pop"):
             time.sleep(2 * attempt)
 
     raise Exception(last_error)
+
+

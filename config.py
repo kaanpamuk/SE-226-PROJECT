@@ -6,8 +6,8 @@
 # ──────────────────────────────────────────────────────────────
 # API ANAHTARLARI — Çalıştırmadan önce kendi anahtarlarınızla değiştirin
 # ──────────────────────────────────────────────────────────────
-GEMINI_API_KEY = ""
-LASTFM_API_KEY = ""
+GEMINI_API_KEY = "AQ.Ab8RN6Jo_L1hnHblvUNYPCGkL7Y9lmYD4Isjif0VheosN34Zpw"
+LASTFM_API_KEY = "56b29f8172077e6005444fb5d19b84af"
 
 # ──────────────────────────────────────────────────────────────
 # Last.fm API
@@ -66,6 +66,46 @@ GENRE_VISUAL_STYLES = {
 # ──────────────────────────────────────────────────────────────
 # Görsel oluşturma ayarları
 # ──────────────────────────────────────────────────────────────
+# Genre → guaranteed Last.fm tag(s) prepended to Gemini's tags
+# Era → kısa Last.fm tag
+ERA_SHORTHAND = {
+    "1970s": "70s",
+    "1980s": "80s",
+    "1990s": "90s",
+    "2000s": "2000s",
+    "2010s": "2010s",
+    "2020s": "2020s",
+}
+
+# Genre → kısa Last.fm tag
+GENRE_SHORTHAND = {
+    "Pop":           "pop",
+    "Rock":          "rock",
+    "Hip-Hop / Rap": "hip-hop",
+    "Electronic":    "electronic",
+    "Indie":         "indie",
+    "R&B / Soul":    "r&b",
+    "Jazz":          "jazz",
+    "Metal":         "metal",
+    "Türk Pop":      "turkish pop",
+    "Klasik":        "classical",
+}
+
+GENRE_LASTFM_SEED_TAGS = {
+    "Pop":          ["pop"],
+    "Rock":         ["rock"],
+    "Hip-Hop / Rap":["hip-hop", "rap"],
+    "Electronic":   ["electronic"],
+    "Indie":        ["indie"],
+    "R&B / Soul":   ["r&b", "soul"],
+    "Jazz":         ["jazz"],
+    "Metal":        ["metal"],
+    "Türk Pop":     ["turkish pop", "turk pop", "turkish"],
+    "Klasik":       ["classical", "classical music"],
+}
+
 POLLINATIONS_BASE_URL = "https://image.pollinations.ai/prompt/"
 COVER_IMAGE_WIDTH = 600
 COVER_IMAGE_HEIGHT = 600
+
+
