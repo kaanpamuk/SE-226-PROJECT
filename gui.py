@@ -1,13 +1,3 @@
-# ============================================================
-# gui.py — Tkinter Arayüzü (Mavi / Beyaz / Siyah Tema)
-# PDA-226: Kurgusal Albüm Oluşturucu
-# ============================================================
-# GEREKSİNİM 2: Tkinter + ttk widget'ları
-# GEREKSİNİM 3: Varsayılan değerli giriş widget'ları
-# GEREKSİNİM 7: Spotify tarzı düzen, Dinle butonları
-# GEREKSİNİM 8: JSON + PNG olarak dışa aktarma
-# GEREKSİNİM 9: Arka plan iş parçacığı + durum güncellemeleri
-# ============================================================
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
