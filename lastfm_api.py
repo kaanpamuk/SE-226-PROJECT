@@ -1,10 +1,3 @@
-# ============================================================
-# lastfm_api.py — Last.fm API Entegrasyonu
-# PDA-226: Kurgusal Albüm Oluşturucu
-# ============================================================
-# GEREKSİNİM 1: tag.gettoptracks ile gerçek parçaları çek
-# GEREKSİNİM 5: Çoklu etiket sorgusu, tekrar kaldırma, parça sayısı
-# ============================================================
 
 import requests
 from config import LASTFM_BASE_URL, LASTFM_API_KEY
@@ -68,18 +61,18 @@ def build_tracklist(tags, track_count):
             - artist (str): Sanatçı adı
             - url (str): Last.fm sayfası URL'si
     """
-    seen = set()  # Tekrar kontrolü için "başlık - sanatçı" takibi
+    seen = set()
     tracklist = []
 
-    # Her etiket başına kaç parça çekileceğini hesapla
-    # Tekrarları telafi etmek için gerekenden fazla çek
+
     per_tag_limit = max(10, (track_count * 2) // len(tags) + 2) if tags else 10
 
     for tag in tags:
-        # Karakter temizliği yaparken boşlukları silmiyoruz (Türkçe pop için)
+
         tag = tag.replace("&", "").replace("/", "").strip()
 
-        # "rb" çıkarsa Last.fm'in sevdiği "rnb"ye dönüştürüyoruz (R&B ayrımı için)
+        # API Compatibility: Last.fm uses "rnb" instead of "rb" to index tracks.
+        # This prevents empty API responses for R&B genre queries.
         if tag == "rb":
             tag = "rnb"
 
@@ -93,7 +86,7 @@ def build_tracklist(tags, track_count):
             artist_name = track.get("artist", {}).get("name", "Unknown Artist")
             url = track.get("url", "")
 
-            # Tekrar kontrol anahtarı oluştur (büyük/küçük harf duyarsız)
+
             dedup_key = f"{title.lower()} - {artist_name.lower()}"
 
             if dedup_key not in seen:
@@ -104,13 +97,9 @@ def build_tracklist(tags, track_count):
                     "url": url,
                 })
 
-        # KRİTİK DÜZELTME: İçerideki ve dışarıdaki "if len(tracklist) >= track_count: break"
-        # satırlarını sildik. Böylece döngü erken kırılmayacak, tüm etiketleri (duygu ve sanatçıları)
-        # tek tek dolaşıp muazzam, zengin bir ortak havuz oluşturacak!
 
-    # Sonuçları döndürmeden önce havuzu güzelce karıştırıyoruz
     import random
     random.shuffle(tracklist)
 
-    # Tam olarak istenen sayıya (8 şarkıya) şimdi güvenle kırpıyoruz
+
     return tracklist[:track_count]

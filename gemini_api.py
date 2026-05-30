@@ -1,31 +1,22 @@
-# ============================================================
-# gemini_api.py — Gemini LLM Entegrasyonu
-# PDA-226: Kurgusal Albüm Oluşturucu
-# ============================================================
-# GEREKSİNİM 4: Gemini, albüm meta verilerini JSON olarak üretir
-# ============================================================
 
 import json
 from google import genai
 from config import GEMINI_API_KEY
 
-# Gemini istemcisini API anahtarıyla yapılandır
+
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 
 def _strip_markdown_fences(text):
-    """
-    Gemini'nin bazen JSON'u sardığı markdown kod bloğu işaretlerini kaldırır.
-    Örn: ```json ... ``` → düz JSON metni
-    """
+
     text = text.strip()
     if text.startswith("```"):
-        # Açılış işaret satırını kaldır
+
         text = text.split("```", 1)[1]
-        # Dil tanımlayıcısını kaldır (örn: 'json')
+
         if text.startswith("json"):
             text = text[4:]
-        # Kapanış işaretini kaldır
+
         if "```" in text:
             text = text.rsplit("```", 1)[0]
         text = text.strip()
@@ -34,8 +25,7 @@ def _strip_markdown_fences(text):
 
 def query_gemini(journal_text, genre, era, track_count):
     """
-    Günlük girdisini ve parametreleri Gemini LLM'e gönderir.
-    Albüm meta verilerini içeren bir sözlük döndürür:
+
         {
             "album_name": str,
             "artist_name": str,
@@ -45,8 +35,7 @@ def query_gemini(journal_text, genre, era, track_count):
             "cover_prompt": str,
             "lastfm_tags": [str, ...]
         }
-    JSON ayrıştırma başarısız olursa ValueError fırlatır.
-    API hataları için Exception fırlatır.
+
     """
     prompt = f"""You are a creative music AI. Based on the following journal entry / mood description, 
 generate a FICTIONAL album concept. Return ONLY valid JSON with this exact schema:
@@ -83,15 +72,16 @@ Return ONLY the JSON object, nothing else."""
             model="gemini-2.5-flash",
             contents=prompt
         )
+
         raw_text = response.text.strip()
 
-        # Varsa markdown kod bloğu işaretlerini kaldır
+
         clean_text = _strip_markdown_fences(raw_text)
 
-        # JSON'u ayrıştır
+
         album_data = json.loads(clean_text)
 
-        # Gerekli alanları doğrula
+
         required_fields = [
             "album_name", "artist_name", "year", "label",
             "mood_description", "cover_prompt", "lastfm_tags"
@@ -105,7 +95,12 @@ Return ONLY the JSON object, nothing else."""
 
         return album_data
 
+
     except json.JSONDecodeError as e:
+
         raise ValueError(f"Failed to parse Gemini response as JSON: {e}\nRaw response: {raw_text}")
+
     except Exception as e:
+
         raise Exception(f"Gemini API error: {e}")
+

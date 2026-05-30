@@ -1,15 +1,11 @@
-# config.py — API Anahtarları, Sabitler ve Uygulama Parametreleri
-# PDA-226: Kurgusal Albüm Oluşturucu
 
-# API ANAHTARLARI 
+GEMINI_API_KEY = "AQ.Ab8RN6J53gnqkOX-6qMIh9r2U6NTUAKZGzFBx9vXTtFn3UDnBg"
+LASTFM_API_KEY = "56b29f8172077e6005444fb5d19b84af"
 
-GEMINI_API_KEY = ""
-LASTFM_API_KEY = ""
 
-# Last.fm API
 LASTFM_BASE_URL = "https://ws.audioscrobbler.com/2.0/"
 
-# Albüm Oluşturma Parametreleri 
+
 GENRES = [
     "Pop",
     "Rock",
@@ -38,9 +34,7 @@ DEFAULT_TRACK_COUNT = 8
 MIN_TRACK_COUNT = 6
 MAX_TRACK_COUNT = 14
 
-# Türe özel görsel stil açıklamaları (kapak görseli istemi için)
-# Albüm kapak görseli Pollinations.ai ile oluşturulurken
-# Gemini'nin kapak istemine bu açıklamalar eklenir
+
 
 GENRE_VISUAL_STYLES = {
     "Pop":          "vibrant neon colors, glossy, modern pop album cover aesthetic, bright lighting",
@@ -56,7 +50,7 @@ GENRE_VISUAL_STYLES = {
 }
 
 
-# Görsel oluşturma ayarları
+
 POLLINATIONS_BASE_URL = "https://image.pollinations.ai/prompt/"
 COVER_IMAGE_WIDTH = 600
 COVER_IMAGE_HEIGHT = 600

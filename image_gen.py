@@ -1,9 +1,3 @@
-# ============================================================
-# image_gen.py — Yapay Zeka Görsel Oluşturma (Pollinations.ai)
-# PDA-226: Kurgusal Albüm Oluşturucu
-# ============================================================
-# GEREKSİNİM 6: Kapak istemi + tür stili → albüm kapak görseli
-# ============================================================
 
 import requests
 from PIL import Image
@@ -18,7 +12,7 @@ from config import (
     GENRE_VISUAL_STYLES,
 )
 
-# Prompt'un URL'de sorun yaratmaması için maksimum karakter sınırı
+
 _MAX_PROMPT_LEN = 480
 _MAX_RETRIES = 3
 
@@ -28,7 +22,6 @@ def _truncate_prompt(text, max_len=_MAX_PROMPT_LEN):
     if len(text) <= max_len:
         return text
     truncated = text[:max_len]
-    # Son boşluktan kes ki kelime ortasından bölünmesin
     last_space = truncated.rfind(" ")
     if last_space > max_len // 2:
         truncated = truncated[:last_space]
@@ -51,20 +44,20 @@ def generate_cover(prompt, genre="Pop"):
     Hatalar:
         Exception: Görsel oluşturma veya indirme başarısız olursa fırlatılır
     """
-    # Gemini istemini türe özel görsel stille birleştir
+
     genre_style = GENRE_VISUAL_STYLES.get(genre, "")
     full_prompt = f"{prompt}, {genre_style}, album cover art, high quality, detailed"
 
-    # Prompt'u kısalt — çok uzun URL'ler Pollinations'da 500 hatasına yol açar
+
     full_prompt = _truncate_prompt(full_prompt)
 
-    # İstemi URL formatında kodla
+
     encoded_prompt = quote(full_prompt)
 
-    # Rastgele seed ekle — her seferinde farklı görsel üretmek için
+
     seed = random.randint(1, 999999)
 
-    # Pollinations URL'sini oluştur
+
     url = (
         f"{POLLINATIONS_BASE_URL}{encoded_prompt}"
         f"?width={COVER_IMAGE_WIDTH}"
@@ -73,14 +66,14 @@ def generate_cover(prompt, genre="Pop"):
         f"&seed={seed}"
     )
 
-    # Retry mekanizması — geçici sunucu hatalarına karşı
+
     last_error = None
     for attempt in range(1, _MAX_RETRIES + 1):
         try:
             response = requests.get(url, timeout=120)
             response.raise_for_status()
 
-            # Yanıt baytlarını PIL Image nesnesine dönüştür
+
             image = Image.open(io.BytesIO(response.content)).convert("RGB")
             return image
 
@@ -91,7 +84,7 @@ def generate_cover(prompt, genre="Pop"):
         except Exception as e:
             last_error = f"Error processing generated image: {e}"
 
-        # Son denemede değilse bekle ve tekrar dene
+
         if attempt < _MAX_RETRIES:
             time.sleep(2 * attempt)
 
