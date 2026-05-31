@@ -1,6 +1,6 @@
 
 import requests
-from PIL import Image
+from PIL import Image, ImageEnhance
 import io
 import time
 import random
@@ -10,6 +10,9 @@ from config import (
     COVER_IMAGE_WIDTH,
     COVER_IMAGE_HEIGHT,
     GENRE_VISUAL_STYLES,
+    COVER_IMAGE_ENHANCE,
+    COVER_SHARPNESS_FACTOR,
+    COVER_CONTRAST_FACTOR,
 )
 
 
@@ -75,6 +78,9 @@ def generate_cover(prompt, genre="Pop"):
 
 
             image = Image.open(io.BytesIO(response.content)).convert("RGB")
+            if COVER_IMAGE_ENHANCE:
+                image = ImageEnhance.Sharpness(image).enhance(COVER_SHARPNESS_FACTOR)
+                image = ImageEnhance.Contrast(image).enhance(COVER_CONTRAST_FACTOR)
             return image
 
         except requests.exceptions.Timeout:
