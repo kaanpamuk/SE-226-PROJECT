@@ -1,4 +1,3 @@
-
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from PIL import Image, ImageTk
@@ -16,10 +15,6 @@ from gemini_api import query_gemini
 from lastfm_api import build_tracklist
 from image_gen import generate_cover
 
-
-# ──────────────────────────────────────────────────────────────
-# Renk Paleti — Mavi / Beyaz / Siyah
-# ──────────────────────────────────────────────────────────────
 BLACK          = "#0A0A0A"
 BLACK_LIGHT    = "#111111"
 BLACK_CARD     = "#161616"
@@ -64,7 +59,6 @@ class AlbumGeneratorApp:
         self.root.minsize(1050, 650)
         self.root.configure(bg=BLACK)
 
-        # Uygulama durumu
         self.album_data = None
         self.tracklist = None
         self.cover_image = None
@@ -75,9 +69,6 @@ class AlbumGeneratorApp:
         self._setup_style()
         self._build_ui()
 
-    # ──────────────────────────────────────────────────────────
-    # Tema ve Stil
-    # ──────────────────────────────────────────────────────────
     def _setup_style(self):
         """ttk stillerini yapılandır — mavi/beyaz/siyah."""
         s = ttk.Style()
@@ -86,7 +77,6 @@ class AlbumGeneratorApp:
         s.configure("Panel.TFrame", background=BLACK_LIGHT)
         s.configure("Deep.TFrame",  background=BLACK)
 
-        # Açılır kutu (Combobox)
         s.configure("Accent.TCombobox",
                      fieldbackground=BLACK_FIELD, background=BLACK_FIELD,
                      foreground=WHITE, arrowcolor=BLUE_LIGHT,
@@ -97,13 +87,11 @@ class AlbumGeneratorApp:
               selectbackground=[("readonly", BLACK_FIELD)],
               selectforeground=[("readonly", WHITE)])
 
-        # Sayı kutusu (Spinbox)
         s.configure("Accent.TSpinbox",
                      fieldbackground=BLACK_FIELD, background=BLACK_FIELD,
                      foreground=WHITE, arrowcolor=BLUE_LIGHT,
                      borderwidth=1, padding=4)
 
-        # Oluştur butonu — düz mavi
         s.configure("Generate.TButton",
                      background=BLUE, foreground=WHITE,
                      font=("Segoe UI", 11, "bold"),
@@ -111,7 +99,6 @@ class AlbumGeneratorApp:
         s.map("Generate.TButton",
               background=[("active", BLUE_LIGHT), ("disabled", WHITE_FAINT)])
 
-        # Kaydet butonu — koyu mavi
         s.configure("Save.TButton",
                      background=BLUE_DARK, foreground=WHITE,
                      font=("Segoe UI", 10, "bold"),
@@ -119,9 +106,6 @@ class AlbumGeneratorApp:
         s.map("Save.TButton",
               background=[("active", BLUE), ("disabled", WHITE_FAINT)])
 
-    # ──────────────────────────────────────────────────────────
-    # Arayüz Oluşturma
-    # ──────────────────────────────────────────────────────────
     def _build_ui(self):
         wrapper = ttk.Frame(self.root, style="Deep.TFrame")
         wrapper.pack(fill=tk.BOTH, expand=True)
@@ -130,9 +114,6 @@ class AlbumGeneratorApp:
         tk.Frame(wrapper, width=1, bg=BORDER).pack(side=tk.LEFT, fill=tk.Y)
         self._build_right(wrapper)
 
-    # ──────────────────────────────────────────────────────────
-    # Sol Panel
-    # ──────────────────────────────────────────────────────────
     def _build_left(self, parent):
         left = ttk.Frame(parent, style="Panel.TFrame", width=380)
         left.pack(side=tk.LEFT, fill=tk.Y)
@@ -141,7 +122,6 @@ class AlbumGeneratorApp:
         pad = tk.Frame(left, bg=BLACK_LIGHT)
         pad.pack(fill=tk.BOTH, expand=True, padx=26, pady=26)
 
-        # ── Başlık ──
         row = tk.Frame(pad, bg=BLACK_LIGHT)
         row.pack(anchor="w", fill=tk.X)
         tk.Label(row, text="♪", bg=BLACK_LIGHT, fg=BLUE_LIGHT,
@@ -153,10 +133,8 @@ class AlbumGeneratorApp:
                  bg=BLACK_LIGHT, fg=WHITE_MID,
                  font=("Segoe UI", 9)).pack(anchor="w", pady=(4, 20))
 
-        # Mavi vurgu çizgisi
         tk.Frame(pad, height=3, bg=BLUE).pack(fill=tk.X, pady=(0, 22))
 
-        # ── Ruh Hali ──
         self._label(pad, "Your Mood (English or Turkish)")
 
         self.journal_text = tk.Text(
@@ -178,7 +156,6 @@ class AlbumGeneratorApp:
         self.journal_text.bind("<FocusIn>", self._ph_in)
         self.journal_text.bind("<FocusOut>", self._ph_out)
 
-        # ── Tür ──
         self._label(pad, "Genre")
         self.genre_var = tk.StringVar(value=DEFAULT_GENRE)
         ttk.Combobox(pad, textvariable=self.genre_var,
@@ -186,7 +163,6 @@ class AlbumGeneratorApp:
                      style="Accent.TCombobox",
                      font=("Segoe UI", 10)).pack(fill=tk.X, pady=(0, 14))
 
-        # ── Dönem ──
         self._label(pad, "Era")
         self.era_var = tk.StringVar(value=DEFAULT_ERA)
         ttk.Combobox(pad, textvariable=self.era_var,
@@ -194,7 +170,6 @@ class AlbumGeneratorApp:
                      style="Accent.TCombobox",
                      font=("Segoe UI", 10)).pack(fill=tk.X, pady=(0, 14))
 
-        # ── Parça Sayısı ──
         self._label(pad, "Track Count")
         self.track_count_var = tk.IntVar(value=DEFAULT_TRACK_COUNT)
         ttk.Spinbox(pad, from_=MIN_TRACK_COUNT, to=MAX_TRACK_COUNT,
@@ -204,13 +179,11 @@ class AlbumGeneratorApp:
                     font=("Segoe UI", 10),
                     width=6).pack(anchor="w", pady=(0, 28))
 
-        # ── Oluştur ──
         self.gen_btn = ttk.Button(pad, text="GENERATE ALBUM",
                                   style="Generate.TButton",
                                   command=self.generate_album)
         self.gen_btn.pack(fill=tk.X, pady=(0, 12))
 
-        # ── Durum ──
         self.status_lbl = tk.Label(pad, text="Ready",
                                    bg=BLACK_LIGHT, fg=WHITE_DIM,
                                    font=("Segoe UI", 8, "italic"), anchor="w")
@@ -220,14 +193,10 @@ class AlbumGeneratorApp:
         tk.Label(parent, text=text, bg=BLACK_LIGHT, fg=BLUE_LIGHT,
                  font=("Segoe UI", 10, "bold")).pack(anchor="w", pady=(0, 5))
 
-    # ──────────────────────────────────────────────────────────
-    # Sağ Panel
-    # ──────────────────────────────────────────────────────────
     def _build_right(self, parent):
         self.right = ttk.Frame(parent, style="Deep.TFrame")
         self.right.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        # Karşılama ekranı
         self.welcome = tk.Frame(self.right, bg=BLACK)
         self.welcome.pack(fill=tk.BOTH, expand=True)
         c = tk.Frame(self.welcome, bg=BLACK)
@@ -240,7 +209,6 @@ class AlbumGeneratorApp:
                  bg=BLACK, fg=WHITE_DIM,
                  font=("Segoe UI", 9, "italic")).pack()
 
-        # Albüm çerçevesi (gizli)
         self.album_frame = tk.Frame(self.right, bg=BLACK)
         self.r_canvas = tk.Canvas(self.album_frame, bg=BLACK,
                                    highlightthickness=0, bd=0)
@@ -260,9 +228,6 @@ class AlbumGeneratorApp:
         self.r_canvas.bind("<Leave>",
                            lambda e: self.r_canvas.unbind_all("<MouseWheel>"))
 
-    # ──────────────────────────────────────────────────────────
-    # Yer Tutucu Metin
-    # ──────────────────────────────────────────────────────────
     _PH = "I was looking at the sea in Izmir. It was raining softly, and an old song was playing..."
 
     def _set_ph(self):
@@ -278,9 +243,6 @@ class AlbumGeneratorApp:
         if not self.journal_text.get("1.0", tk.END).strip():
             self._set_ph()
 
-    # ──────────────────────────────────────────────────────────
-    # Oluştur (GEREKSİNİM 9)
-    # ──────────────────────────────────────────────────────────
     def generate_album(self):
         """Arka plan iş parçacığında albüm oluşturmayı başlatır."""
         if self.is_generating:
@@ -296,7 +258,6 @@ class AlbumGeneratorApp:
             tc = self.track_count_var.get()
         except tk.TclError:
             tc = DEFAULT_TRACK_COUNT
-        # Güvenlik: değeri izin verilen aralığa sınırla
         tc = max(MIN_TRACK_COUNT, min(MAX_TRACK_COUNT, tc))
 
         self.is_generating = True
@@ -339,9 +300,6 @@ class AlbumGeneratorApp:
         self._status(f"✗ {msg}", ERROR_RED)
         messagebox.showerror("Error", msg)
 
-    # ──────────────────────────────────────────────────────────
-    # Albümü Göster (GEREKSİNİM 7)
-    # ──────────────────────────────────────────────────────────
     def _show_album(self, data, tracks, img):
         self.welcome.pack_forget()
         self.album_frame.pack(fill=tk.BOTH, expand=True)
@@ -353,11 +311,9 @@ class AlbumGeneratorApp:
         body = tk.Frame(self.r_inner, bg=BLACK)
         body.pack(fill=tk.BOTH, expand=True, padx=34, pady=24)
 
-        # ═══════════ Başlık: Kapak + Bilgi ═══════════
         hdr = tk.Frame(body, bg=BLACK)
         hdr.pack(fill=tk.X, pady=(0, 18))
 
-        # Mavi kenarlıklı kapak görseli
         sz = 210
         bordered = Image.new("RGB", (sz + 6, sz + 6), BLUE)
         resized = img.resize((sz, sz), Image.LANCZOS)
@@ -371,23 +327,19 @@ class AlbumGeneratorApp:
         info = tk.Frame(hdr, bg=BLACK)
         info.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, pady=6)
 
-        # Rozet
         tk.Label(info, text="  CURATED PLAYLIST  ", bg=BLUE_DARK,
                  fg=WHITE, font=("Segoe UI", 7, "bold"),
                  padx=6, pady=2).pack(anchor="w")
 
-        # Albüm adı — büyük beyaz kalın
         tk.Label(info, text=data.get("album_name", "Untitled"),
                  bg=BLACK, fg=WHITE,
                  font=("Segoe UI", 24, "bold"),
                  wraplength=420, justify="left").pack(anchor="w", pady=(10, 2))
 
-        # Sanatçı — mavi
         tk.Label(info, text=data.get("artist_name", "Unknown Artist"),
                  bg=BLACK, fg=BLUE_LIGHT,
                  font=("Segoe UI", 13)).pack(anchor="w", pady=(0, 6))
 
-        # Ruh hali — italik orta beyaz
         mood = data.get("mood_description", "")
         if mood:
             tk.Label(info, text=f'"{mood}"',
@@ -395,7 +347,6 @@ class AlbumGeneratorApp:
                      font=("Segoe UI", 9, "italic"),
                      wraplength=420, justify="left").pack(anchor="w", pady=(0, 8))
 
-        # Meta bilgi satırı
         parts = []
         y = data.get("year", "")
         if y:
@@ -407,7 +358,6 @@ class AlbumGeneratorApp:
         tk.Label(info, text="  ·  ".join(parts), bg=BLACK, fg=WHITE_DIM,
                  font=("Segoe UI", 9)).pack(anchor="w", pady=(0, 10))
 
-        # Etiketler — mavi tonları
         tags = data.get("lastfm_tags", [])
         if tags:
             tf = tk.Frame(info, bg=BLACK)
@@ -418,10 +368,8 @@ class AlbumGeneratorApp:
                          font=("Segoe UI", 8, "bold"),
                          padx=6, pady=2).pack(side=tk.LEFT, padx=(0, 5), pady=2)
 
-        # ═══════════ Ayırıcı ═══════════
         tk.Frame(body, height=1, bg=BORDER).pack(fill=tk.X, pady=(6, 0))
 
-        # ═══════════ Parça Listesi Başlığı ═══════════
         th = tk.Frame(body, bg=BLACK)
         th.pack(fill=tk.X, pady=(12, 4))
         tk.Label(th, text="#", bg=BLACK, fg=WHITE_DIM,
@@ -433,12 +381,10 @@ class AlbumGeneratorApp:
         tk.Label(th, text="", bg=BLACK, width=10).pack(side=tk.LEFT)
         tk.Frame(body, height=1, bg=BORDER).pack(fill=tk.X, pady=(0, 2))
 
-        # ═══════════ Parça Satırları ═══════════
         for i, tr in enumerate(tracks):
             self._track_row(body, i + 1, tr,
                             BLACK_TRACK_A if i % 2 == 0 else BLACK_TRACK_B)
 
-        # ═══════════ Kaydet Butonu ═══════════
         sf = tk.Frame(body, bg=BLACK)
         sf.pack(fill=tk.X, pady=(22, 8))
         ttk.Button(sf, text="SAVE ALBUM  (JSON + PNG)",
@@ -453,9 +399,6 @@ class AlbumGeneratorApp:
         if items:
             self.r_canvas.itemconfigure(items[0], width=e.width)
 
-    # ──────────────────────────────────────────────────────────
-    # Parça Satırı
-    # ──────────────────────────────────────────────────────────
     def _track_row(self, parent, num, track, bg):
         row = tk.Frame(parent, bg=bg, padx=10, pady=9)
         row.pack(fill=tk.X, pady=(1, 0))
@@ -502,9 +445,6 @@ class AlbumGeneratorApp:
         row.bind("<Enter>", enter)
         row.bind("<Leave>", leave)
 
-    # ──────────────────────────────────────────────────────────
-    # Dışa Aktarma (GEREKSİNİM 8)
-    # ──────────────────────────────────────────────────────────
     def export_album(self):
         """Oluşturulan albümü JSON + PNG dosyaları olarak dışa aktarır."""
         if not self.album_data or not self.cover_image:
@@ -542,8 +482,5 @@ class AlbumGeneratorApp:
         except Exception as ex:
             messagebox.showerror("Export Error", f"Failed: {ex}")
 
-    # ──────────────────────────────────────────────────────────
-    # Durum
-    # ──────────────────────────────────────────────────────────
     def _status(self, text, color=WHITE_DIM):
         self.status_lbl.config(text=text, fg=color)
